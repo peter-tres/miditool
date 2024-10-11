@@ -50,47 +50,46 @@ def add_to_songs_file(file):
     midi_data = pretty_midi.PrettyMIDI(file)
 
     notes_and_timings = []
-
+    durations = []
     for instrument in midi_data.instruments:
         if instrument.name == "Piano":
             for note in instrument.notes:
                 pitch, timing = note.pitch, note.start
                 notes_and_timings.append([pitch,timing])
 
+                duration = note.end-note.start
+                durations.append([duration,timing])
+
 
 
 
 
     notes_sorted = sorted(notes_and_timings, key=lambda nt: nt[1])
+    durations_sorted = sorted(durations,key=lambda nt:nt[1])
 
-    only_notes = []
-
-    for note in notes_sorted:
-        note,timing = note
-        only_notes.append(note)
+    only_notes = [note[0] for note in notes_sorted]
+    only_durations = [duration[0] for duration in durations_sorted]
 
 
 
 
     final_sequence = [midi_note_mapping[note][1] for note  in only_notes]
 
+
     song_name = file_name
 
     source_dict = {}
-
-
 
     if os.path.isfile("songs.json"):
         with open(f"songs.json", "r") as f:
             source_dict = json.load(f)
 
-
-    source_dict[song_name] = final_sequence
+    source_dict.update({song_name:{}})
+    source_dict[song_name].update({"sequence": final_sequence})
+    source_dict[song_name].update({"durations": only_durations})
 
     with open(f"songs.json", "w") as f:
         json.dump(source_dict, f, indent=2)
-
-
 
     pass
 
