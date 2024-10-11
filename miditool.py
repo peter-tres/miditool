@@ -1,42 +1,105 @@
 import pretty_midi
 import numpy as np
 from collections import Counter
+import os
+import re
+import json
+import math
+import glob
+
+
+def custom_round(f: float):
+    nearest = round(f / 0.2) *0.2
+
+    if nearest == 0.0:
+        nearest = math.ceil(f/0.2) * 0.2
+
+    return nearest
+
+
+def add_to_songs_file(file):
+    file_name = os.path.splitext(file)[0]
+
+    with open("out.txt") as f:
+        data = f.read()
+
+
+
+    data = data.split('\n')
+
+    data = [d.split('\t') for d in data]
+
+    data.pop(0)
+
+    midi_note_mapping = {int(d[0]):[d[1], d[2]] for d in data if len(d) > 3}
+
+
+    for idx,key in enumerate(midi_note_mapping):
+        value = midi_note_mapping[key]
+        piano_note, english_note = value
+
+        split_idx = english_note.find('/')
+        if split_idx > -1:
+            english_note = english_note[split_idx+1::]
+        english_note = english_note[0:3]
+        english_note = re.sub('[^0-9a-zA-Z]+', '', english_note)
+        english_note = "".join(english_note.split())
+        midi_note_mapping[key] = [piano_note, english_note]
+
+
+    midi_data = pretty_midi.PrettyMIDI(file)
+
+    notes_and_timings = []
+
+    for instrument in midi_data.instruments:
+        if instrument.name == "Piano":
+            for note in instrument.notes:
+                pitch, timing = note.pitch, note.start
+                notes_and_timings.append([pitch,timing])
 
 
 
 
 
+    notes_sorted = sorted(notes_and_timings, key=lambda nt: nt[1])
 
-midi_data = pretty_midi.PrettyMIDI("ffx.mid")
+    only_notes = []
 
-
-
-
-notes_and_timings = []
-
-for instrument in midi_data.instruments:
-    if instrument.name == "Piano":
-        for note in instrument.notes:
-            pitch, timing = note.pitch, note.start
-
-            notes_and_timings.append([pitch,timing])
+    for note in notes_sorted:
+        note,timing = note
+        only_notes.append(note)
 
 
 
 
+    final_sequence = [midi_note_mapping[note][1] for note  in only_notes]
 
-notes_sorted = sorted(notes_and_timings, key=lambda nt: nt[1])
+    song_name = file_name
 
-only_notes = []
-
-
-for note in notes_sorted:
-    note,timing = note
-    only_notes.append(note)
+    source_dict = {}
 
 
 
+    if os.path.isfile("songs.json"):
+        with open(f"songs.json", "r") as f:
+            source_dict = json.load(f)
+
+
+    source_dict[song_name] = final_sequence
+
+    with open(f"songs.json", "w") as f:
+        json.dump(source_dict, f, indent=2)
 
 
 
+    pass
 
+
+
+glob = glob.glob('*.mid')
+
+print(glob)
+
+for midi in glob:
+    print(midi)
+    add_to_songs_file(midi)
