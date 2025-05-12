@@ -45,7 +45,7 @@ for row in site_data:
         row[k] = v.get_text()
 
 
-with open("out.txt", "w") as f:
+with open("key.txt", "w") as f:
     f.write("MIDI NOTE\tPIANO NOTE\tNOTE NAME\t\n")
     for row in site_data:
         for col in row:

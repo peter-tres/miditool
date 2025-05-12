@@ -20,7 +20,7 @@ def custom_round(f: float):
 def add_to_songs_file(file):
     file_name = os.path.splitext(file)[0]
 
-    with open("out.txt") as f:
+    with open("key.txt") as f:
         data = f.read()
 
 
