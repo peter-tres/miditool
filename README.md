@@ -5,3 +5,12 @@ To use this, you must first generate the key file. One is provided but the scrip
 Do what you want with this. I used it to make this game:
 
 https://peter-tres.itch.io/
+
+
+
+Scrape tool dependencies:
+BeautifulSoup
+Selenium
+
+MIDI tool dependencies:
+pretty_midi

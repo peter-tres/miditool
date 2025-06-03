@@ -1,5 +1,4 @@
 import pretty_midi
-import numpy as np
 from collections import Counter
 import os
 import re
