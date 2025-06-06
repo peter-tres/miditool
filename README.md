@@ -14,3 +14,8 @@ Selenium
 
 MIDI tool dependencies:
 pretty_midi
+
+Realistically, MIDIs can be weird a lot of the times I noticed. This only
+grabs certain instrument tracks (pianos mainly).
+
+I used the midis from this site mainly: https://bitmidi.com/
